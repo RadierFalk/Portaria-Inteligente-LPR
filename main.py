@@ -6,7 +6,7 @@ from ultralytics import YOLO
 import database 
 
 
-MODEL_PATH = '/models/model-plates.pt' 
+MODEL_PATH = './models/model-plates.pt' 
 CONF_THRESHOLD = 0.5   
 PADDING = 15
 

@@ -19,7 +19,9 @@ Este projeto utiliza Visão Computacional e Deep Learning para identificar placa
             conda activate portaria_lpr
 
 Instalação das Bibliotecas (Versões Estáveis)
-    requirements.txt
+    //Instalar primeiro o pacote do Torch
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+    pip install -r requirements.txt
 
 3. Estrutura do ProjetoCertifique-se de que os arquivos estão organizados assim:Plaintext/projeto-lpr
 ├── main.py            # Código principal do sistema
