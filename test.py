@@ -3,7 +3,7 @@ import easyocr
 from ultralytics import YOLO
 
 # 1. Carrega o novo modelo de área única e o leitor OCR
-model = YOLO('model-plates.pt')  # Certifique-se que o best.pt está na pasta
+model = YOLO('/models/model-plates.pt')  # Certifique-se que o best.pt está na pasta
 reader = easyocr.Reader(['pt'], gpu=False) #
 
 # 2. Inicializa a Webcam
