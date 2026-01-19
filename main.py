@@ -28,39 +28,27 @@ class ControladorPortaria:
     def processar_ia(self, corte):
         self.ocupado = True
         try:
-            
             resultados = reader.readtext(corte, detail=0)
+            texto_completo = "".join(resultados).replace(" ", "").upper()
             
-            texto_bruto = "".join(resultados).upper()
-            texto_limpo = re.sub(r'[^A-Z0-9]', '', texto_bruto)
-            
-            if len(texto_limpo) >= 7:
-                
-                for i in range(len(texto_limpo) - 6):
-                    candidato = list(texto_limpo[i:i+7])
-                    
-                    for j in range(3):
-                        if candidato[j] == '0': candidato[j] = 'O'
-                        if candidato[j] == '1': candidato[j] = 'I'
-                    
-                    placa_final = "".join(candidato)
-                    
-                    if self.validar_placa(placa_final):
-                        self.placa_atual = placa_final
-                        nome = database.verificar_placa(placa_final)
+            if len(texto_completo) >= 7:
+                for i in range(len(texto_completo) - 6):
+                    candidato = texto_completo[i:i+7]
+                    if self.validar_placa(candidato):
+                        self.placa_atual = candidato
+                        # BUSCA TODOS OS DADOS AGORA
+                        dados = database.buscar_dados_completos(candidato)
                         
-                        if nome:
-                            self.status = f"LIBERADO: {nome}"
-                            print(f">>> {placa_final} - {nome} <<<")
+                        if dados:
+                            # dados[1]=nome, [3]=endereco, [4]=modelo
+                            self.status = f"LIBERADO: {dados[1]} ({dados[4]})"
+                            self.info_detalhada = f"End: {dados[3]} | Tel: {dados[2]}"
                         else:
-                            self.status = f"BLOQUEADO: {placa_final}"
-                        return # Sucesso!
-            
-            if self.status == "SISTEMA ATIVO":
-                self.status = "AGUARDANDO..."
-
-        except Exception as e:
-            print(f"Erro no OCR: {e}")
+                            self.status = f"BLOQUEADO: {candidato}"
+                            self.info_detalhada = "Visitante não cadastrado"
+                        return
+            self.status = "BUSCANDO..."
+            self.info_detalhada = ""
         finally:
             self.ocupado = False
 
@@ -96,6 +84,7 @@ while True:
     cv2.rectangle(frame, (0, 0), (500, 90), (0, 0, 0), -1)
     cv2.putText(frame, f"PLACA: {controle.placa_atual}", (10, 35), 1, 1.8, (255, 255, 255), 2)
     cv2.putText(frame, controle.status, (10, 75), 1, 1.4, (0, 255, 255), 2)
+    cv2.putText(frame, getattr(controle, 'info_detalhada', ""), (10, 110), 1, 1.0, (200, 200, 200), 1)
 
     cv2.imshow("Portaria LPR - Modelo Area Unica", frame)
     if cv2.waitKey(1) & 0xFF == ord('q'): break
